@@ -6,14 +6,16 @@ const cTable = require('console.table');
 const connection = require('./db_connection.js');
 const department = require('./department.js');
 
+var productSales = [];
+var arrayIDname = [];
 var values = [[
 //    Product Table Column Names
-    chalk.green.bold('Product ID'), 
-    chalk.green.bold('Product name'), 
-    chalk.green.bold('Department'), 
-    chalk.green.bold('Price'), 
-    chalk.green.bold('Stock (in units)'),
-    chalk.green.bold('Product Sales'),]];
+    chalk.green.bold('Department ID'), 
+    chalk.green.bold('Department name'), 
+    chalk.green.bold('Over head costs'), 
+    chalk.green.bold('Product Sales'), 
+    chalk.green.bold('Total Profit')
+    ]];
 
 var questions = [
   {
@@ -50,6 +52,8 @@ function start(){
     console.log(chalk.red.bold('***************   BAMAZON SUPERVISOR DASHBOARD   ***************'));
     console.log();
     supervisorMenu();
+    calculateSales();
+    showDepartmentSales();
 }
 ///////////////////////////////////////////////////////////////////
 function supervisorMenu(){
@@ -66,8 +70,18 @@ function supervisorMenu(){
     });
 }
 
+var sqlr = 'SELECT department.department_id, department.department_name, department.over_head_costs, products.product_sales FROM department,products GROUP BY department.department_name ORDER BY department.department_id';
+
 function showDepartmentSales(){
 //    anotherJoin to show form departments and products
+    connection.query(sqlr, 
+    function(err, results) {
+        if (err) throw err;
+        
+        console.log();
+        
+        readAllFromDB(results); 
+    });
 };
 
 function addDepartment(){
@@ -88,6 +102,41 @@ function writeNewInDB(id,departments,ohc){
     function(err, res) {
       console.log('Department '+chalk.green.bold(departments)+' Added Successfully');
       console.log();
+//      showDepartmentSales();
       supervisorMenu();    
     })
 }
+
+function readAllFromDB(r){
+        for (var i = 0; i<r.length; i++){
+//          TO SHOW THE ROW RED WHEN THE QUANTITY IS LESS OR EQUAL THAN ONE
+                arrayIDname[0] = r[i].department_id; 
+                arrayIDname[1] = r[i].department_name; 
+                arrayIDname[2] = r[i].over_head_costs;
+                arrayIDname[3] = productSales[i];
+                arrayIDname[4] = productSales[i]-arrayIDname[2];
+            
+                values.push(arrayIDname);
+                arrayIDname = [];
+        }
+        
+        console.table(values[0], values.slice(1));
+        supervisorMenu();
+}
+
+var sqlp = 'SELECT products.department_id, SUM (products.product_sales) AS total_sales FROM products GROUP BY products.department_id';
+
+function calculateSales(){
+//    anotherJoin to show form departments and products
+    connection.query(sqlp, 
+    function(err, results) {
+        if (err) throw err;
+        
+        for (var i = 0; i<results.length; i++){
+//          TO SHOW THE ROW RED WHEN THE QUANTITY IS LESS OR EQUAL THAN ONE
+            productSales.push(results[i].total_sales);
+        }
+        
+    });
+    
+};
