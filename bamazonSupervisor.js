@@ -19,7 +19,7 @@ var questions = [
   {
     name: "menuS",
     type: "list",
-    message: chalk.green("SELECT ANY OPTION FROM THE MENU BELOW:\n"),
+    message: chalk.green("SELECT ANY OPTION FROM THE MENU BELOW:"),
     choices: ['View Product Sales by Department','Create New Department']
   },
 ];
@@ -71,7 +71,7 @@ function showDepartmentSales(){
 };
 
 function addDepartment(){
-//    use the departmet.js constructor and inquirer to get the values
+//  use the departmet.js constructor and inquirer to get the values
     questioner.prompt(newDepa).then(answer => {
         var newDepa = new department(answer.name,answer.overHcost);
         writeNewInDB(8,newDepa.name,newDepa.overHcost);
@@ -79,14 +79,15 @@ function addDepartment(){
 };
 
 function writeNewInDB(id,departments,ohc){
-    connection.query("INSERT INTO products SET ?",
+    connection.query("INSERT INTO department SET ?",
     { 
-      department_id:id,    
+        department_id: id,    
       department_name: departments,        
       over_head_costs: ohc,
     },
     function(err, res) {
       console.log('Department '+chalk.green.bold(departments)+' Added Successfully');
+      console.log();
       supervisorMenu();    
     })
 }

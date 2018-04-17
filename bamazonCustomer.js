@@ -6,6 +6,7 @@ const cTable = require('console.table');
 
 const connection = require('./db_connection.js');
 
+var joinDBs = 'SELECT products.item_id, products.product_name, products.department_id, products.price, products.stock_quantity, products.product_sales, department.department_id, department.department_name FROM (products INNER JOIN department ON products.department_id = department.department_id)';
 //    values will contain the product table
 var values = [[
 //    Product Table Column Names
@@ -27,8 +28,7 @@ connection.connect(function(err) {
 });
 //    Reading All product info from Database
 var showProductList = function(){
-    var sqlRead = 'SELECT * FROM products';
-    connection.query(sqlRead, 
+    connection.query(joinDBs, 
     function(err, results) {
         if (err) throw err;
         
@@ -41,7 +41,7 @@ var showProductList = function(){
         readAllFromDB(results); 
     });
 }
-
+//////////////////////////////////////////////////////////////////////////////
 function readAllFromDB(r){
         for (var i = 0; i<r.length; i++){
 //          TO SHOW THE ROW RED WHEN THE QUANTITY IS LESS OR EQUAL THAN ONE
@@ -89,7 +89,7 @@ var questions = [
     message: "how many units of the product you would like to buy?"
   }    
 ];
-
+//////////////////////////////////////////////////////////////////////////////
 function askWantToBuy() {
     questioner.prompt(questions[0]).then(answer => {
         if (answer.wantToBuy) {
@@ -101,21 +101,21 @@ function askWantToBuy() {
         }
   });
 }
-
+//////////////////////////////////////////////////////////////////////////////
 function askProductID(){
     questioner.prompt(questions[1]).then(answer => {
         selectedProduct = answer.productID;
         askHowMany();
     });
 }
-
+//////////////////////////////////////////////////////////////////////////////
 function askHowMany(){
     questioner.prompt(questions[2]).then(answer => {
          typedQuantity = answer.howMany;
          checkInventory(typedQuantity,values[selectedProduct][4]);    
     });
 }
-
+//////////////////////////////////////////////////////////////////////////////
 function checkInventory(a,b){
     if (a>b){
         console.log();
@@ -128,13 +128,14 @@ function checkInventory(a,b){
         processOrder(a,b);
     }
 }
-
+//////////////////////////////////////////////////////////////////////////////
 function processOrder(userQuant,AvalQuant){
     writeToDB(AvalQuant-userQuant);
     showTotalCost(userQuant);
-    showProductList();
+    
 };
-
+//////////////////////////////////////////////////////////////////////////////
+//updating stock 
 function writeToDB(newValue){
     var sqlWrite = 'UPDATE products SET ? WHERE ?';
     connection.query(sqlWrite, 
@@ -156,13 +157,13 @@ function writeToDB(newValue){
             chalk.green.bold('Product name'), 
             chalk.green.bold('Department'), 
             chalk.green.bold('Price'), 
-            chalk.green.bold('Stock (in units)')]];
-        
+            chalk.green.bold('Stock (in units)'),
+            chalk.green.bold('Product Sales')]];
         console.log();
         
     });
 }
-
+//////////////////////////////////////////////////////////////////////////////
 function showTotalCost(qSelected){
     var sqlRead = 'SELECT * FROM products';
     connection.query(sqlRead, 
@@ -172,7 +173,28 @@ function showTotalCost(qSelected){
         var price = results[selectedProduct-1].price;
         console.log('You have paid '+chalk.yellow.bold('$')+chalk.yellow.bold(price*qSelected)+' for '+qSelected+' '+results[selectedProduct-1].product_name);
         console.log();
+        updateProductSales(results[selectedProduct-1].product_sales+price*qSelected);
+        
     });
 }
-
+//////////////////////////////////////////////////////////////////////////////
+function updateProductSales(newValue){
+ var sqlWrite = 'UPDATE products SET ? WHERE ?';
+    connection.query(sqlWrite, 
+    [
+      {
+        product_sales: newValue
+      },
+      {
+        item_id: selectedProduct
+      }
+    ],
+                 
+    function(err, results) {
+        if (err) throw err;
+        
+        console.log();
+        showProductList();
+    });    
+}
 

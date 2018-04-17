@@ -223,7 +223,7 @@ function howManyToAdd(){
         updateDB(howMany,selectedQuantity);
     });
 }
-
+///////////////////////////////////////////////////////////////////
 function currentQ(){
         var sql = 'SELECT stock_quantity FROM products WHERE product_name='+"'"+selectedProduct+"'";
         connection.query(sql, function(err, results) {
@@ -266,7 +266,7 @@ function updateDB(newValue,b){
 function addNewProduct(){
     questioner.prompt(newProductQ).then(answer => {
         var newProduct = new product(answer.name,answer.department,answer.price,answer.stock);
-        createDBitem(selectID.length+1,newProduct.name,newProduct.department,newProduct.price,newProduct.stock);
+       createDBitem(selectID.length+1,newProduct.name,newProduct.department,newProduct.price,newProduct.stock);
        
     });
 };
