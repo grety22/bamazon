@@ -1,0 +1,25 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "bamazon store",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grety22/bamazon.git"
+  },
+  "author": "Gretel M",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/grety22/bamazon/issues"
+  },
+  "homepage": "https://github.com/grety22/bamazon#readme",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "console.table": "^0.10.0",
+    "inquirer": "^6.0.0",
+    "mysql": "^2.15.0"
+  }
+}

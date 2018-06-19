@@ -9,13 +9,13 @@ const department = require('./department.js');
 var productSales = [];
 var arrayIDname = [];
 var values = [[
-//    Product Table Column Names
+//  Product Table Column Names
     chalk.green.bold('Department ID'), 
     chalk.green.bold('Department name'), 
     chalk.green.bold('Over head costs'), 
     chalk.green.bold('Product Sales'), 
     chalk.green.bold('Total Profit')
-    ]];
+]];
 
 var questions = [
   {
@@ -23,7 +23,7 @@ var questions = [
     type: "list",
     message: chalk.green("SELECT ANY OPTION FROM THE MENU BELOW:"),
     choices: ['View Product Sales by Department','Create New Department']
-  },
+  }
 ];
 
 var newDepa = [
@@ -52,8 +52,9 @@ function start(){
     console.log(chalk.red.bold('***************   BAMAZON SUPERVISOR DASHBOARD   ***************'));
     console.log();
     supervisorMenu();
+    console.log();
     calculateSales();
-    showDepartmentSales();
+    
 }
 ///////////////////////////////////////////////////////////////////
 function supervisorMenu(){
@@ -73,22 +74,19 @@ function supervisorMenu(){
 var sqlr = 'SELECT department.department_id, department.department_name, department.over_head_costs, products.product_sales FROM department,products GROUP BY department.department_name ORDER BY department.department_id';
 
 function showDepartmentSales(){
-//    anotherJoin to show form departments and products
+//  anotherJoin to show form departments and products
     connection.query(sqlr, 
     function(err, results) {
         if (err) throw err;
-        
-        console.log();
-        
         readAllFromDB(results); 
     });
-};
+}; 
 
 function addDepartment(){
 //  use the departmet.js constructor and inquirer to get the values
     questioner.prompt(newDepa).then(answer => {
         var newDepa = new department(answer.name,answer.overHcost);
-        writeNewInDB(8,newDepa.name,newDepa.overHcost);
+        writeNewInDB(newDepa.name,newDepa.overHcost);
     });
 };
 
@@ -100,16 +98,17 @@ function writeNewInDB(id,departments,ohc){
       over_head_costs: ohc,
     },
     function(err, res) {
+      if (err) throw err;    
       console.log('Department '+chalk.green.bold(departments)+' Added Successfully');
       console.log();
-//      showDepartmentSales();
+//    showDepartmentSales();
       supervisorMenu();    
     })
 }
 
 function readAllFromDB(r){
         for (var i = 0; i<r.length; i++){
-//          TO SHOW THE ROW RED WHEN THE QUANTITY IS LESS OR EQUAL THAN ONE
+//              TO SHOW THE ROW RED WHEN THE QUANTITY IS LESS OR EQUAL THAN ONE
                 arrayIDname[0] = r[i].department_id; 
                 arrayIDname[1] = r[i].department_name; 
                 arrayIDname[2] = r[i].over_head_costs;
@@ -119,7 +118,7 @@ function readAllFromDB(r){
                 values.push(arrayIDname);
                 arrayIDname = [];
         }
-        
+        console.log();
         console.table(values[0], values.slice(1));
         supervisorMenu();
 }
@@ -136,7 +135,5 @@ function calculateSales(){
 //          TO SHOW THE ROW RED WHEN THE QUANTITY IS LESS OR EQUAL THAN ONE
             productSales.push(results[i].total_sales);
         }
-        
     });
-    
 };

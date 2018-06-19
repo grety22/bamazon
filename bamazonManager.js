@@ -13,7 +13,7 @@ var values = [[
     chalk.green.bold('Department'), 
     chalk.green.bold('Price'), 
     chalk.green.bold('Stock (in units)'),
-    chalk.green.bold('Product Sales'),]];
+    chalk.green.bold('Product Sales')]];
 
 var howMany = 0;
 var selectID = [];
@@ -100,12 +100,12 @@ function managerMenu() {
     
 //    Set all vars to default before to start
     values = [[
-    chalk.green.bold('Product ID'), 
-    chalk.green.bold('Product name'), 
-    chalk.green.bold('Department'), 
-    chalk.green.bold('Price'), 
-    chalk.green.bold('Stock (in units)'),
-    chalk.green.bold('Product Sales'),
+        chalk.green.bold('Product ID'), 
+        chalk.green.bold('Product name'), 
+        chalk.green.bold('Department'), 
+        chalk.green.bold('Price'), 
+        chalk.green.bold('Stock (in units)'),
+        chalk.green.bold('Product Sales'),
     ]];
 
     howMany = 0;
@@ -137,8 +137,7 @@ function managerMenu() {
 }
 ///////////////////////////////////////////////////////////////////
 function viewProducts(sql,msg){
-    connection.query(sql, 
-    function(err, results) {
+    connection.query(sql, function(err, results) {
         if (err) throw err;
         console.log();
         
@@ -255,7 +254,7 @@ function updateDB(newValue,b){
             chalk.green.bold('Product name'), 
             chalk.green.bold('Department'), 
             chalk.green.bold('Price'), 
-            chalk.green.bold('Stock (in units)')]];
+            chalk.green.bold('Stock (in units)'),
             chalk.green.bold('Product Sales')]];
         
         console.log();
@@ -265,24 +264,30 @@ function updateDB(newValue,b){
 ///////////////////////////////////////////////////////////////////
 function addNewProduct(){
     questioner.prompt(newProductQ).then(answer => {
-        var newProduct = new product(answer.name,answer.department,answer.price,answer.stock);
+       var newProduct = new product(answer.name,answer.department,answer.price,answer.stock);
        createDBitem(selectID.length+1,newProduct.name,newProduct.department,newProduct.price,newProduct.stock);
-       
+    
+       console.log(newProduct.name);
     });
 };
 ///////////////////////////////////////////////////////////////////
 function createDBitem(id,product,department,price,stock){
-    connection.query("INSERT INTO products SET ?",
-    { 
-      item_id:id,    
-      product_name: product,        
-      department_id: department,
-      price: price,
-      stock_quantity: stock
-    },
+    
+    var sqlInsert = 'INSERT INTO products SET ?';
+    var newOne = {
+        item_id: id,
+        product_name: product,
+        department_id: (selectDepa.indexOf(department))+1,
+        price: price,
+        stock_quantity: stock
+    }
+    
+    connection.query(sqlInsert, newOne,
+                     
     function(err, res) {
-      console.log('Product '+chalk.green.bold(product)+' Added Successfully');
-      managerMenu();    
+       if (err) throw err;    
+       console.log('Product '+chalk.green.bold(product)+' Added Successfully');
+       managerMenu(); 
+        
     })
 }
-
