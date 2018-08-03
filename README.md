@@ -1,2 +1,9 @@
 # bamazon
-node js CLI store
+NodeJS + MySQL : CLI store customized with npm CHALK package
+
+## BAMAZON CUSTOMER CONSOLE
+
+## BAMAZON MANAGER CONSOLE
+
+## BAMAZON SUPERVISOR CONSOLE
+
